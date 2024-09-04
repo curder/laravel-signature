@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Payload\Builder;
 
-
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Payload\Payload;
 use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Payload\Payload;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class SignBuilderTest extends TestCase
 {

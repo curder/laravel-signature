@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Contracts;
-
 
 use Hypocenter\LaravelSignature\Signature\Signature;
 

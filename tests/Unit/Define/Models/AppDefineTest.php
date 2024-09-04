@@ -1,17 +1,15 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Define\Models;
 
-
-use Hypocenter\LaravelSignature\Define\Models\AppDefine;
 use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Define\Models\AppDefine;
 
 class AppDefineTest extends TestCase
 {
     public function testIntoSignatureDefine(): void
     {
-        $m = new AppDefine();
+        $m = new AppDefine;
         $m->id = 1;
         $m->name = 'name';
         $m->secret = 'secret';

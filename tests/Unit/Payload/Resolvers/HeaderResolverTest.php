@@ -1,13 +1,11 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Payload\Resolvers;
 
-
-use Hypocenter\LaravelSignature\Payload\Resolvers\HeaderResolver;
-use Hypocenter\LaravelSignature\Payload\Resolvers\RequestProxy;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Payload\Resolvers\RequestProxy;
+use Hypocenter\LaravelSignature\Payload\Resolvers\HeaderResolver;
 
 class HeaderResolverTest extends TestCase
 {
@@ -16,17 +14,19 @@ class HeaderResolverTest extends TestCase
     public function testSetConfig(): void
     {
         $config = [
-            'key_app_id'    => 'app-id',
-            'key_sign'      => 'sign',
+            'key_app_id' => 'app-id',
+            'key_sign' => 'sign',
             'key_timestamp' => 'x-sign-time',
-            'key_nonce'     => 'x-sign-nonce',
+            'key_nonce' => 'x-sign-nonce',
         ];
 
         $req = m::mock(RequestProxy::class);
         $rs = new HeaderResolver($req);
         $rs->setConfig($config);
 
-        $mergedConf = (function () { return $this->config; })->call($rs);
+        $mergedConf = (function () {
+            return $this->config;
+        })->call($rs);
 
         $this->assertEquals($config, $mergedConf);
     }

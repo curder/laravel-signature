@@ -1,14 +1,12 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Define\Repositories;
 
-
+use PHPUnit\Framework\TestCase;
 use Hypocenter\LaravelSignature\Define\Define;
-use Hypocenter\LaravelSignature\Define\Repositories\ArrayRepository;
 use Hypocenter\LaravelSignature\Define\Repository;
 use Hypocenter\LaravelSignature\Interfaces\Configurator;
-use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Define\Repositories\ArrayRepository;
 
 class ArrayRepositoryTest extends TestCase
 {
@@ -16,21 +14,21 @@ class ArrayRepositoryTest extends TestCase
     {
         $defines = [
             [
-                'id'     => 1,
-                'name'   => 'name',
+                'id' => 1,
+                'name' => 'name',
                 'secret' => 'secret',
-                'config' => null
-            ]
+                'config' => null,
+            ],
         ];
 
-        $rp = new ArrayRepository();
+        $rp = new ArrayRepository;
         $this->assertInstanceOf(Configurator::class, $rp);
 
         $rp->setConfig([
             'defines' => $defines,
-            'other'   => [
-                'id' => 1
-            ]
+            'other' => [
+                'id' => 1,
+            ],
         ]);
 
         $returned = (function () {
@@ -44,20 +42,20 @@ class ArrayRepositoryTest extends TestCase
     {
         $defines = [
             [
-                'id'     => 1,
-                'name'   => 'name',
+                'id' => 1,
+                'name' => 'name',
                 'secret' => 'secret',
-                'config' => null
+                'config' => null,
             ],
             [
-                'id'     => 2,
-                'name'   => 'name2',
+                'id' => 2,
+                'name' => 'name2',
                 'secret' => 'secret',
                 'config' => [1, 2, 3],
-            ]
+            ],
         ];
 
-        $rp = new ArrayRepository();
+        $rp = new ArrayRepository;
         $rp->setConfig(['defines' => $defines]);
 
         $this->assertInstanceOf(Repository::class, $rp);

@@ -1,22 +1,20 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit;
 
-
-use Hypocenter\LaravelSignature\Define\Repository;
-use Hypocenter\LaravelSignature\Define\RepositoryAware;
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Interfaces\Configurator;
-use Hypocenter\LaravelSignature\Payload\Resolver;
-use Hypocenter\LaravelSignature\Payload\ResolverAware;
-use Hypocenter\LaravelSignature\Signature\DefaultSignature;
-use Hypocenter\LaravelSignature\Signature\Signature;
-use Hypocenter\LaravelSignature\SignatureManager;
-use Illuminate\Container\Container;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit\Framework\TestCase;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Hypocenter\LaravelSignature\Payload\Resolver;
+use Hypocenter\LaravelSignature\SignatureManager;
+use Hypocenter\LaravelSignature\Define\Repository;
+use Hypocenter\LaravelSignature\Signature\Signature;
+use Hypocenter\LaravelSignature\Payload\ResolverAware;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Hypocenter\LaravelSignature\Define\RepositoryAware;
+use Hypocenter\LaravelSignature\Interfaces\Configurator;
+use Hypocenter\LaravelSignature\Signature\DefaultSignature;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class SignatureManagerTest extends TestCase
 {
@@ -29,9 +27,9 @@ class SignatureManagerTest extends TestCase
 
         $m = new SignatureManager([
             'default' => 'default',
-            'signatures'   => [
+            'signatures' => [
                 'default' => [
-                    'class'      => 'signature',
+                    'class' => 'signature',
                 ],
             ],
         ], $app);
@@ -62,23 +60,23 @@ class SignatureManagerTest extends TestCase
         $app->shouldReceive('make')->once()->with('signature')->andReturn($sg);
 
         $manager = new SignatureManager([
-            'signatures'   => [
+            'signatures' => [
                 'default' => [
-                    'class'      => 'signature',
-                    'resolver'   => 'test',
-                    'repository' => 'test'
+                    'class' => 'signature',
+                    'resolver' => 'test',
+                    'repository' => 'test',
                 ],
             ],
-            'resolvers'    => [
+            'resolvers' => [
                 'test' => [
-                    'class' => 'resolver'
-                ]
+                    'class' => 'resolver',
+                ],
             ],
             'repositories' => [
                 'test' => [
-                    'class' => 'repository'
-                ]
-            ]
+                    'class' => 'repository',
+                ],
+            ],
         ], $app);
 
         $signature = (function () {
@@ -104,22 +102,22 @@ class SignatureManagerTest extends TestCase
         $app->shouldReceive('make')->once()->with(DefaultSignature::class)->andReturn(m::spy(DefaultSignature::class));
 
         $manager = new SignatureManager([
-            'signatures'   => [
+            'signatures' => [
                 'default' => [
-                    'resolver'   => 'test',
-                    'repository' => 'test'
+                    'resolver' => 'test',
+                    'repository' => 'test',
                 ],
             ],
-            'resolvers'    => [
+            'resolvers' => [
                 'test' => [
-                    'class' => 'resolver'
-                ]
+                    'class' => 'resolver',
+                ],
             ],
             'repositories' => [
                 'test' => [
-                    'class' => 'repository'
-                ]
-            ]
+                    'class' => 'repository',
+                ],
+            ],
         ], $app);
 
         (function () {
@@ -140,8 +138,8 @@ class SignatureManagerTest extends TestCase
                 'test' => [
                     'class' => 'test',
                     'field' => 'value',
-                ]
-            ]
+                ],
+            ],
         ], $app);
 
         $resolver = (function () {
@@ -165,8 +163,8 @@ class SignatureManagerTest extends TestCase
 
         $manager = new SignatureManager([
             'repositories' => [
-                'test' => ['class' => 'test']
-            ]
+                'test' => ['class' => 'test'],
+            ],
         ], $app);
 
         (function () {
@@ -187,8 +185,8 @@ class SignatureManagerTest extends TestCase
                 'test' => [
                     'class' => 'test',
                     'field' => 'value',
-                ]
-            ]
+                ],
+            ],
         ], $app);
 
         $resolver = (function () {
@@ -212,8 +210,8 @@ class SignatureManagerTest extends TestCase
 
         $manager = new SignatureManager([
             'resolvers' => [
-                'test' => ['class' => 'test']
-            ]
+                'test' => ['class' => 'test'],
+            ],
         ], $app);
 
         (function () {

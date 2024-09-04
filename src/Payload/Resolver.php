@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Payload;
-
 
 interface Resolver
 {

@@ -2,37 +2,37 @@
 
 return [
     // 默认的驱动
-    'default'      => 'default',
+    'default' => 'default',
 
     // 支持多个签名器配置
-    'signatures'   => [
+    'signatures' => [
         'default' => [
-            'resolver'       => 'header',
-            'repository'     => 'array',
-            'nonce_length'   => 16,
-            'cache_driver'   => 'file',
-            'cache_name'     => 'laravel-signature',
-            'time_tolerance' => 5* 60,
+            'resolver' => 'header',
+            'repository' => 'array',
+            'nonce_length' => 16,
+            'cache_driver' => 'file',
+            'cache_name' => 'laravel-signature',
+            'time_tolerance' => 5 * 60,
             'default_app_id' => 'tFVzAUy07VIj2p8v',
-        ]
+        ],
     ],
 
     // 数据获取器定义，支持从不同来源获取
-    'resolvers'    => [
+    'resolvers' => [
         'header' => [
-            'class'         => Hypocenter\LaravelSignature\Payload\Resolvers\HeaderResolver::class,
-            'key_app_id'    => 'X-SIGN-APP-ID',
-            'key_sign'      => 'X-SIGN',
+            'class' => Hypocenter\LaravelSignature\Payload\Resolvers\HeaderResolver::class,
+            'key_app_id' => 'X-SIGN-APP-ID',
+            'key_sign' => 'X-SIGN',
             'key_timestamp' => 'X-SIGN-TIME',
-            'key_nonce'     => 'X-SIGN-NONCE',
+            'key_nonce' => 'X-SIGN-NONCE',
         ],
-        'query'  => [
-            'class'         => Hypocenter\LaravelSignature\Payload\Resolvers\QueryResolver::class,
-            'key_app_id'    => '_appid',
-            'key_sign'      => '_sign',
+        'query' => [
+            'class' => Hypocenter\LaravelSignature\Payload\Resolvers\QueryResolver::class,
+            'key_app_id' => '_appid',
+            'key_sign' => '_sign',
             'key_timestamp' => '_time',
-            'key_nonce'     => '_nonce',
-        ]
+            'key_nonce' => '_nonce',
+        ],
     ],
 
     // App 定义数据仓库，支持从不同来源获取
@@ -44,14 +44,14 @@ return [
         ],
         // 从配置文件中读取
         'array' => [
-            'class'   => Hypocenter\LaravelSignature\Define\Repositories\ArrayRepository::class,
+            'class' => Hypocenter\LaravelSignature\Define\Repositories\ArrayRepository::class,
             'defines' => [
                 // Add more defines here.
                 [
-                    'id'     => 'tFVzAUy07VIj2p8v',
-                    'name'   => 'RPC',
+                    'id' => 'tFVzAUy07VIj2p8v',
+                    'name' => 'RPC',
                     'secret' => 'u4JsCDCwCUakBCVn',
-                    'config' => null
+                    'config' => null,
                 ],
             ],
         ],

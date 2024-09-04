@@ -1,21 +1,16 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Payload\Resolvers;
-
 
 use Hypocenter\LaravelSignature\Interfaces\Configurator;
 
 class HeaderResolver extends RequestResolver implements Configurator
 {
-    /**
-     * @var array
-     */
-    private $config = [
-        'key_app_id'    => 'X-SIGN-APP-ID',
-        'key_sign'      => 'X-SIGN',
+    private array $config = [
+        'key_app_id' => 'X-SIGN-APP-ID',
+        'key_sign' => 'X-SIGN',
         'key_timestamp' => 'X-SIGN-TIME',
-        'key_nonce'     => 'X-SIGN-NONCE',
+        'key_nonce' => 'X-SIGN-NONCE',
     ];
 
     public function setConfig(array $config): void

@@ -7,7 +7,7 @@ Signature helper for Laravel
 
 * 对请求参数进行签名验证, 以保证数据的完整性
 * 每次签名只能使用一次
-* 支持 Laravel 5.x 和 Laravel 6.x
+* 支持 Laravel 11.x
 
 #### 安装
 

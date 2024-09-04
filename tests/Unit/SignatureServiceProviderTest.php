@@ -2,11 +2,10 @@
 
 namespace Hypocenter\LaravelSignature\Tests\Unit;
 
-use Hypocenter\LaravelSignature\Contracts\Factory;
-use Hypocenter\LaravelSignature\SignatureManager;
-use Hypocenter\LaravelSignature\SignatureServiceProvider;
 use Orchestra\Testbench\TestCase;
-
+use Hypocenter\LaravelSignature\SignatureManager;
+use Hypocenter\LaravelSignature\Contracts\Factory;
+use Hypocenter\LaravelSignature\SignatureServiceProvider;
 
 class SignatureServiceProviderTest extends TestCase
 {

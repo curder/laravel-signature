@@ -1,22 +1,18 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Middlewares;
 
-
 use Closure;
-use Hypocenter\LaravelSignature\Contracts\Factory;
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Exceptions\VerifyException;
+use Exception;
 use Illuminate\Http\Request;
+use Hypocenter\LaravelSignature\Contracts\Factory;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Hypocenter\LaravelSignature\Exceptions\VerifyException;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class SignatureMiddleware
 {
-    /**
-     * @var Factory
-     */
-    private $signatureManager;
+    private Factory $signatureManager;
 
     public function __construct(Factory $signatureManager)
     {
@@ -24,11 +20,10 @@ class SignatureMiddleware
     }
 
     /**
-     * @param Request $request
-     * @param Closure $next
-     * @param null $signatureName
+     * @param  null  $signatureName
      * @return mixed
-     * @throws \Exception|\Psr\SimpleCache\InvalidArgumentException
+     *
+     * @throws Exception
      */
     public function handle(Request $request, Closure $next, $signatureName = null)
     {
@@ -36,9 +31,7 @@ class SignatureMiddleware
             $signature = $this->signatureManager->get($signatureName);
             $payload = $signature->resolve();
             $signature->verify($payload);
-        } catch (VerifyException $e) {
-            throw new HttpException(400, $e->getMessage(), $e);
-        } catch (InvalidArgumentException $e) {
+        } catch (VerifyException|InvalidArgumentException $e) {
             throw new HttpException(400, $e->getMessage(), $e);
         }
 

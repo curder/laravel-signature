@@ -1,12 +1,10 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Feature;
 
-
-use Hypocenter\LaravelSignature\Middlewares\SignatureMiddleware;
-use Hypocenter\LaravelSignature\SignatureServiceProvider;
 use Illuminate\Contracts\Routing\Registrar;
+use Hypocenter\LaravelSignature\SignatureServiceProvider;
+use Hypocenter\LaravelSignature\Middlewares\SignatureMiddleware;
 
 abstract class SignatureTestCase extends \Orchestra\Testbench\TestCase
 {
@@ -25,9 +23,9 @@ abstract class SignatureTestCase extends \Orchestra\Testbench\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         $this->artisan('migrate:refresh', ['--database' => 'testing']);
-        $this->withFactories(__DIR__ . '/../../database/factories');
+        //        $this->withFactories(__DIR__.'/../../database/factories');
     }
 
     protected function setUpRoute($signatureName = null): \Illuminate\Routing\Route
@@ -39,7 +37,7 @@ abstract class SignatureTestCase extends \Orchestra\Testbench\TestCase
             return 'bar';
         });
         if ($signatureName) {
-            $route->middleware(SignatureMiddleware::class . ':' . $signatureName);
+            $route->middleware(SignatureMiddleware::class.':'.$signatureName);
         } else {
             $route->middleware(SignatureMiddleware::class);
         }

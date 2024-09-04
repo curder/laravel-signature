@@ -1,20 +1,18 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Signature;
 
-
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Cache\Factory;
 use Hypocenter\LaravelSignature\Define\Define;
-use Hypocenter\LaravelSignature\Define\Repository;
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Exceptions\VerifyException;
 use Hypocenter\LaravelSignature\Payload\Payload;
 use Hypocenter\LaravelSignature\Payload\Resolver;
-use Hypocenter\LaravelSignature\Signature\DefaultSignature;
-use Illuminate\Contracts\Cache\Factory;
-use Mockery as m;
+use Hypocenter\LaravelSignature\Define\Repository;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Exceptions\VerifyException;
+use Hypocenter\LaravelSignature\Signature\DefaultSignature;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class DefaultSignatureTest extends TestCase
 {
@@ -22,11 +20,11 @@ class DefaultSignatureTest extends TestCase
 
     public function testSetter(): void
     {
-        $sign = new DefaultSignature();
+        $sign = new DefaultSignature;
         $config = [
-            'nonce_length'   => 10,
-            'cache_driver'   => 'xcache',
-            'cache_name'     => 'laravel-signature',
+            'nonce_length' => 10,
+            'cache_driver' => 'xcache',
+            'cache_name' => 'laravel-signature',
             'time_tolerance' => 5 * 600,
             'default_app_id' => 'xxxxxxx',
         ];
@@ -35,9 +33,9 @@ class DefaultSignatureTest extends TestCase
 
         $res = (function () {
             return [
-                'nonce_length'   => $this->nonceLength,
-                'cache_driver'   => $this->cacheDriver,
-                'cache_name'     => $this->cacheName,
+                'nonce_length' => $this->nonceLength,
+                'cache_driver' => $this->cacheDriver,
+                'cache_name' => $this->cacheName,
                 'time_tolerance' => $this->timeTolerance,
                 'default_app_id' => $this->defaultAppId,
             ];
@@ -63,7 +61,7 @@ class DefaultSignatureTest extends TestCase
         $py = m::spy(Payload::class);
         $rs = m::spy(Resolver::class);
         $rs->shouldReceive('resolvePayload')->once()->andReturn($py);
-        $sign = new DefaultSignature();
+        $sign = new DefaultSignature;
         $sign->setResolver($rs);
 
         $this->assertEquals($py, $sign->resolve());
@@ -93,7 +91,7 @@ class DefaultSignatureTest extends TestCase
         $rp->shouldReceive('findByAppId')->twice()->with($appID)->andReturn($def);
         $rp->shouldReceive('findByAppId')->with('xxxxx')->andReturn(null);
 
-        $sign = new DefaultSignature();
+        $sign = new DefaultSignature;
         $sign->setRepository($rp);
         $ctx = $sign->sign($py);
 
@@ -120,8 +118,8 @@ class DefaultSignatureTest extends TestCase
             ->build();
 
         $cs = m::mock(\Illuminate\Contracts\Cache\Repository::class);
-        $cs->shouldReceive('get')->once()->with('laravel_signature:' . $py2ver->getSign())->andReturn(null);
-        $cs->shouldReceive('set')->once()->with('laravel_signature:' . $py2ver->getSign(), 1, 601);
+        $cs->shouldReceive('get')->once()->with('laravel_signature:'.$py2ver->getSign())->andReturn(null);
+        $cs->shouldReceive('set')->once()->with('laravel_signature:'.$py2ver->getSign(), 1, 601);
         $cf = m::mock(Factory::class);
         $cf->shouldReceive('store')->twice()->andReturn($cs);
 
@@ -157,7 +155,7 @@ class DefaultSignatureTest extends TestCase
             ->setSign('xxxxx')
             ->build();
 
-        $sign = new DefaultSignature();
+        $sign = new DefaultSignature;
 
         $this->expectException(VerifyException::class);
         $this->expectExceptionMessage('Large discrepancy between request timestamp and server time');
@@ -183,7 +181,7 @@ class DefaultSignatureTest extends TestCase
 
         $sign = new DefaultSignature($cf);
         $sign->setConfig([
-            'cache_driver' => 'fake'
+            'cache_driver' => 'fake',
         ]);
 
         $this->expectException(VerifyException::class);
@@ -208,7 +206,7 @@ class DefaultSignatureTest extends TestCase
         $rp = m::mock(Repository::class);
         $rp->shouldReceive('findByAppId')->once()->with('123')->andReturn($def);
 
-        $sign = new DefaultSignature();
+        $sign = new DefaultSignature;
         $sign->setRepository($rp);
 
         $this->expectException(VerifyException::class);

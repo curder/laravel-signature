@@ -1,15 +1,16 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class SignatureCreateAppDefinesTable extends Migration
 {
     /**
      * The database schema.
      *
-     * @var \Illuminate\Database\Schema\Builder
+     * @var Builder
      */
     protected $schema;
 
@@ -25,13 +26,11 @@ class SignatureCreateAppDefinesTable extends Migration
 
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
         $this->schema->create('app_defines', static function (Blueprint $table) {
-            $table->string('id', 64)->primary();
+            $table->char('id', 64)->primary();
             $table->string('name');
             $table->string('secret');
             $table->json('config')->nullable();
@@ -41,8 +40,6 @@ class SignatureCreateAppDefinesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

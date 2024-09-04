@@ -1,11 +1,9 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Define;
 
-
-use Hypocenter\LaravelSignature\Define\Define;
 use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Define\Define;
 
 class DefineTest extends TestCase
 {

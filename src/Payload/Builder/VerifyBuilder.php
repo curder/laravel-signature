@@ -1,23 +1,23 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Payload\Builder;
 
-
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 use Hypocenter\LaravelSignature\Payload\Payload;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class VerifyBuilder extends SignBuilder
 {
     public function setSign(?string $sign): self
     {
         $this->payload->setSign($sign);
+
         return $this;
     }
 
     public function setNonce(?string $nonce): self
     {
         $this->payload->setNonce($nonce);
+
         return $this;
     }
 

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Define;
 
 interface Repository

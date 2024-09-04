@@ -1,11 +1,9 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature;
 
-
-use Hypocenter\LaravelSignature\Contracts\Factory;
 use Illuminate\Support\ServiceProvider;
+use Hypocenter\LaravelSignature\Contracts\Factory;
 
 class SignatureServiceProvider extends ServiceProvider
 {
@@ -14,7 +12,7 @@ class SignatureServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/signature.php', 'signature'
+            __DIR__.'/../config/signature.php', 'signature'
         );
 
         $this->registerSignatureManager();
@@ -22,22 +20,20 @@ class SignatureServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/signature.php' => config_path('signature.php'),
+                __DIR__.'/../config/signature.php' => config_path('signature.php'),
             ], 'signature-config');
 
             $this->publishes([
-                __DIR__ . '/../database/migrations' => database_path('migrations'),
+                __DIR__.'/../database/migrations' => database_path('migrations'),
             ], 'signature-migrations');
 
             $this->publishes([
-                __DIR__ . '/../database/factories' => database_path('factories'),
+                __DIR__.'/../database/factories' => database_path('factories'),
             ], 'signature-factories');
         }
     }
@@ -49,11 +45,7 @@ class SignatureServiceProvider extends ServiceProvider
 
     private function registerSignatureManager(): void
     {
-        $this->app->singleton('signature', static function ($app) {
-            $config = $app['config']->get('signature');
-            return new SignatureManager($config, $app);
-        });
-
+        $this->app->singleton('signature', static fn ($app) => new SignatureManager($app['config']->get('signature'), $app));
         $this->app->alias('signature', Factory::class);
     }
 }

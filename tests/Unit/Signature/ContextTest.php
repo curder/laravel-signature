@@ -1,15 +1,13 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Signature;
 
-
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Hypocenter\LaravelSignature\Define\Define;
 use Hypocenter\LaravelSignature\Payload\Payload;
 use Hypocenter\LaravelSignature\Signature\Context;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit\Framework\TestCase;
-use Mockery as m;
 
 class ContextTest extends TestCase
 {

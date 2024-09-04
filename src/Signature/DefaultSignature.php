@@ -1,46 +1,35 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Signature;
 
-
 use Exception;
-use Hypocenter\LaravelSignature\Define\RepositoryAware;
-use Hypocenter\LaravelSignature\Payload\ResolverAware;
-use Hypocenter\LaravelSignature\Signature\Context;
+use Illuminate\Contracts\Cache\Factory;
 use Hypocenter\LaravelSignature\Define\Define;
-use Hypocenter\LaravelSignature\Define\Repository;
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Exceptions\VerifyException;
-use Hypocenter\LaravelSignature\Interfaces\Configurator;
 use Hypocenter\LaravelSignature\Payload\Payload;
 use Hypocenter\LaravelSignature\Payload\Resolver;
-use Illuminate\Contracts\Cache\Factory;
-use Illuminate\Support\Facades\Cache;
+use Hypocenter\LaravelSignature\Define\Repository;
+use Hypocenter\LaravelSignature\Payload\ResolverAware;
+use Hypocenter\LaravelSignature\Define\RepositoryAware;
+use Hypocenter\LaravelSignature\Interfaces\Configurator;
+use Hypocenter\LaravelSignature\Exceptions\VerifyException;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
-class DefaultSignature implements Signature, Configurator, RepositoryAware, ResolverAware
+class DefaultSignature implements Configurator, RepositoryAware, ResolverAware, Signature
 {
-    /**
-     * @var Repository
-     */
-    private $repository;
-    /**
-     * @var Resolver
-     */
-    private $resolver;
+    private Repository $repository;
 
-    private $nonceLength = 16;
+    private Resolver $resolver;
 
-    private $cacheDriver;
+    private int $nonceLength = 16;
 
-    private $cacheName = 'laravel_signature';
+    private ?string $cacheDriver = null;
 
-    private $timeTolerance = 5 * 60;
+    private string $cacheName = 'laravel_signature';
 
-    private $defaultAppId;
-    /**
-     * @var Factory|null
-     */
+    private int $timeTolerance = 5 * 60;
+
+    private string $defaultAppId;
+
     private $cacheFactory;
 
     public function __construct(?Factory $cache = null)
@@ -51,7 +40,7 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
     public function setConfig(array $config): void
     {
         if (isset($config['nonce_length'])) {
-            $this->nonceLength = (int)$config['nonce_length'];
+            $this->nonceLength = (int) $config['nonce_length'];
         }
         if (isset($config['cache_driver'])) {
             $this->cacheDriver = $config['cache_driver'];
@@ -79,8 +68,6 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
 
     /**
      * 从请求中获取待校验数据
-     *
-     * @return Payload
      */
     public function resolve(): Payload
     {
@@ -90,8 +77,6 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
     /**
      * 签名
      *
-     * @param Payload $payload
-     * @return Context
      * @throws InvalidArgumentException
      * @throws Exception
      */
@@ -120,8 +105,6 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
     /**
      * 校验
      *
-     * @param Payload $payload
-     * @return Context
      * @throws Exception|\Psr\SimpleCache\InvalidArgumentException
      */
     public function verify(Payload $payload): Context
@@ -154,8 +137,9 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
     private function getAppDefine(string $appId): Define
     {
         $define = $this->repository->findByAppId($appId);
-        if (!$define) {
-            throw new InvalidArgumentException('app define "' . $appId . '" not found');
+
+        if (! $define) {
+            throw new InvalidArgumentException('app define "'.$appId.'" not found');
         }
 
         return $define;
@@ -166,9 +150,11 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
         $payload = $ctx->getPayload();
         $define = $ctx->getDefine();
 
-        $data = (array)$payload->getData();
+        $data = (array) $payload->getData();
 
-        assert(!$define, 'signature app define can not be empty');
+        if (! $define) {
+            throw new \http\Exception\InvalidArgumentException('signature app define can not be empty');
+        }
 
         $signArr = [
             $payload->getAppId(),
@@ -188,9 +174,9 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
         $ctx->setSign($sign);
     }
 
-    private function arr2str(?array &$data)
+    private function arr2str(?array &$data): string
     {
-        if (!$data) {
+        if (! $data) {
             return '';
         }
 
@@ -198,18 +184,16 @@ class DefaultSignature implements Signature, Configurator, RepositoryAware, Reso
 
         ksort($data);
         foreach ($data as $i => &$v) {
-            $str[] = "{$i}:" . (is_array($v) ? '[' . $this->arr2str($v) . ']' : $v);
+            $str[] = "{$i}:".(is_array($v) ? '['.$this->arr2str($v).']' : $v);
         }
 
-        return join(';', $str);
+        return implode(';', $str);
     }
 
     /**
-     * @param $len
-     * @return string
      * @throws Exception
      */
-    private function nonce($len)
+    private function nonce($len): string
     {
         $seeds = '1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
         $nonce = '';

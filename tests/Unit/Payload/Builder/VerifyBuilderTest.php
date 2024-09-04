@@ -1,12 +1,11 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Payload\Builder;
 
-
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Payload\Payload;
+use Throwable;
 use PHPUnit\Framework\TestCase;
+use Hypocenter\LaravelSignature\Payload\Payload;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class VerifyBuilderTest extends TestCase
 {
@@ -46,7 +45,7 @@ class VerifyBuilderTest extends TestCase
         $builder = Payload::forVerify();
 
         $this->exceptInvalidArgumentException('the "appId" must not be empty', static function () use ($builder) {
-               $builder->build();
+            $builder->build();
         });
         $this->exceptInvalidArgumentException('the "path" must not be empty', static function () use ($builder) {
             $builder->setAppId('appid');
@@ -76,7 +75,7 @@ class VerifyBuilderTest extends TestCase
         $cls = InvalidArgumentException::class;
         try {
             $cbk();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $isThrow = true;
             $this->assertInstanceOf($cls, $e);
             if ($msg) {

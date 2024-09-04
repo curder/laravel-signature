@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Define\Repositories;
-
 
 use Hypocenter\LaravelSignature\Define\Define;
 use Hypocenter\LaravelSignature\Define\Repository;
@@ -10,7 +8,7 @@ use Hypocenter\LaravelSignature\Interfaces\Configurator;
 
 class ArrayRepository implements Configurator, Repository
 {
-    private $defines = [];
+    private array $defines = [];
 
     public function setConfig(array $config): void
     {
@@ -22,7 +20,7 @@ class ArrayRepository implements Configurator, Repository
     public function findByAppId($appId): ?Define
     {
         $def = collect($this->defines)->firstWhere('id', $appId);
-        if (!$def) {
+        if (! $def) {
             return null;
         }
 

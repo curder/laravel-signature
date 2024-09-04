@@ -1,24 +1,22 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Define\Repositories;
 
-
+use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use Hypocenter\LaravelSignature\Define\Define;
 use Hypocenter\LaravelSignature\Define\IntoDefine;
 use Hypocenter\LaravelSignature\Define\Models\AppDefine;
 use Hypocenter\LaravelSignature\Define\Repositories\ModelRepository;
 use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Illuminate\Database\Eloquent\Model;
-use PHPUnit\Framework\TestCase;
 
 class ModelRepositoryTest extends TestCase
 {
     public function testFindById(): void
     {
-        $rp = new ModelRepository();
+        $rp = new ModelRepository;
         $rp->setConfig([
-            'model' => _Model::class
+            'model' => _Model::class,
         ]);
 
         $def = $rp->findByAppId(1);
@@ -30,23 +28,23 @@ class ModelRepositoryTest extends TestCase
 
     public function testSetConfigEmptyModel(): void
     {
-        $rp = new ModelRepository();
+        $rp = new ModelRepository;
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('The model must not be null');
+        $this->expectExceptionMessage('The model must not be null');
 
         $rp->setConfig([]);
     }
 
     public function testSetConfigNotModel(): void
     {
-        $rp = new ModelRepository();
+        $rp = new ModelRepository;
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectErrorMessage('The model must be subclass of Model');
+        $this->expectExceptionMessage('The model must be subclass of Model');
 
         $rp->setConfig([
-            'model' => _IntoDefineNotModel::class
+            'model' => _IntoDefineNotModel::class,
         ]);
     }
 }
@@ -63,6 +61,7 @@ class _Model extends AppDefine
         if ($id === 1) {
             return new self;
         }
+
         return null;
     }
 
@@ -72,9 +71,7 @@ class _Model extends AppDefine
     }
 }
 
-class _ModelNoIntoDefine extends Model
-{
-}
+class _ModelNoIntoDefine extends Model {}
 
 class _IntoDefineNotModel implements IntoDefine
 {

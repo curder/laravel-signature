@@ -1,18 +1,16 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Payload\Resolvers;
-
 
 use Hypocenter\LaravelSignature\Interfaces\Configurator;
 
 class QueryResolver extends RequestResolver implements Configurator
 {
-    private $config = [
-        'key_app_id'    => '_appid',
-        'key_sign'      => '_sign',
+    private array $config = [
+        'key_app_id' => '_appid',
+        'key_sign' => '_sign',
         'key_timestamp' => '_time',
-        'key_nonce'     => '_nonce',
+        'key_nonce' => '_nonce',
     ];
 
     public function setConfig(array $config): void
@@ -52,5 +50,4 @@ class QueryResolver extends RequestResolver implements Configurator
 
         return $data;
     }
-
 }

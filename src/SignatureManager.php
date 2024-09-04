@@ -1,42 +1,27 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature;
 
-
+use Illuminate\Support\Arr;
+use Illuminate\Container\Container;
+use Hypocenter\LaravelSignature\Payload\Resolver;
 use Hypocenter\LaravelSignature\Contracts\Factory;
 use Hypocenter\LaravelSignature\Define\Repository;
-use Hypocenter\LaravelSignature\Define\RepositoryAware;
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Interfaces\Configurator;
-use Hypocenter\LaravelSignature\Payload\Resolver;
-use Hypocenter\LaravelSignature\Payload\ResolverAware;
-use Hypocenter\LaravelSignature\Signature\DefaultSignature;
 use Hypocenter\LaravelSignature\Signature\Signature;
-use Illuminate\Container\Container;
-use Illuminate\Support\Arr;
+use Hypocenter\LaravelSignature\Payload\ResolverAware;
+use Hypocenter\LaravelSignature\Define\RepositoryAware;
+use Hypocenter\LaravelSignature\Interfaces\Configurator;
+use Hypocenter\LaravelSignature\Signature\DefaultSignature;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class SignatureManager implements Factory
 {
     /**
-     * @var array
-     */
-    private $config;
-
-    /**
      * @var Signature[]
      */
-    private $instances = [];
-    /**
-     * @var Container
-     */
-    private $app;
+    private array $instances = [];
 
-    public function __construct(array $config, Container $app)
-    {
-        $this->config = $config;
-        $this->app = $app;
-    }
+    public function __construct(private array $config, private Container $app) {}
 
     public function get($name = null): Signature
     {
@@ -55,7 +40,8 @@ class SignatureManager implements Factory
     private function resolveSignature($name): Signature
     {
         $c = data_get($this->config, "signatures.{$name}");
-        if (!$c) {
+
+        if (! $c) {
             throw new InvalidArgumentException("no $name signature");
         }
 
@@ -78,7 +64,7 @@ class SignatureManager implements Factory
     private function resolvePayloadResolver($name): Resolver
     {
         $c = data_get($this->config, "resolvers.{$name}");
-        if (!$c) {
+        if (! $c) {
             throw new InvalidArgumentException("no $name resolver");
         }
 
@@ -92,7 +78,7 @@ class SignatureManager implements Factory
     private function resolveDefineRepository($name): Repository
     {
         $c = data_get($this->config, "repositories.{$name}");
-        if (!$c) {
+        if (! $c) {
             throw new InvalidArgumentException("no $name repository");
         }
 

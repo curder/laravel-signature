@@ -1,23 +1,13 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Payload\Resolvers;
-
 
 use Hypocenter\LaravelSignature\Payload\Payload;
 use Hypocenter\LaravelSignature\Payload\Resolver;
 
 abstract class RequestResolver implements Resolver
 {
-    /**
-     * @var RequestProxy
-     */
-    protected $request;
-
-    public function __construct(RequestProxy $request)
-    {
-        $this->request = $request;
-    }
+    public function __construct(protected RequestProxy $request) {}
 
     public function resolvePayload(): Payload
     {

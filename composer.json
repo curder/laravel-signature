@@ -14,7 +14,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Hypocenter\\LaravelSignature\\": "src/"
+      "Hypocenter\\LaravelSignature\\": "src/",
+      "Hypocenter\\LaravelSignature\\Database\\Factories\\": "database/factories/"
     }
   },
   "autoload-dev": {
@@ -23,8 +24,8 @@
     }
   },
   "require": {
-    "php": "^7.2",
-    "laravel/framework": "^5.5||^6.0||^7.0",
+    "php": "^8.1",
+    "illuminate/support": "^11.0",
     "ext-json": "*"
   },
   "extra": {
@@ -35,8 +36,9 @@
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "^8.5.8",
+    "phpunit/phpunit": "^10.1",
     "mockery/mockery": "^1.0",
-    "orchestra/testbench": "^3.8|^4.4|^5.0"
+    "orchestra/testbench": "^9.0",
+    "laravel/pint": "^1.17"
   }
 }

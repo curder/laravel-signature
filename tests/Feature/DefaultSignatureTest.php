@@ -2,10 +2,9 @@
 
 namespace Hypocenter\LaravelSignature\Tests\Feature;
 
-use Hypocenter\LaravelSignature\Contracts\Factory;
-use Hypocenter\LaravelSignature\Payload\Payload;
 use Illuminate\Contracts\Routing\Registrar;
-
+use Hypocenter\LaravelSignature\Payload\Payload;
+use Hypocenter\LaravelSignature\Contracts\Factory;
 
 class DefaultSignatureTest extends SignatureTestCase
 {
@@ -26,22 +25,22 @@ class DefaultSignatureTest extends SignatureTestCase
         $this->assertEquals(40, strlen($ctx->getSign()));
 
         $res = $this->post('/default/foo', ['a' => 1], [
-            'Accept'        => 'application/json',
+            'Accept' => 'application/json',
             'X-SIGN-APP-ID' => $py->getAppId(),
-            'X-SIGN'        => $py->getSign(),
-            'X-SIGN-TIME'   => $py->getTimestamp(),
-            'X-SIGN-NONCE'  => $py->getNonce(),
+            'X-SIGN' => $py->getSign(),
+            'X-SIGN-TIME' => $py->getTimestamp(),
+            'X-SIGN-NONCE' => $py->getNonce(),
         ]);
 
         $res->assertOk();
         $res->assertSee('bar');
 
         $res = $this->post('/default/foo', ['a' => 1], [
-            'Accept'        => 'application/json',
+            'Accept' => 'application/json',
             'X-SIGN-APP-ID' => $py->getAppId(),
-            'X-SIGN'        => $py->getSign(),
-            'X-SIGN-TIME'   => $py->getTimestamp(),
-            'X-SIGN-NONCE'  => $py->getNonce(),
+            'X-SIGN' => $py->getSign(),
+            'X-SIGN-TIME' => $py->getTimestamp(),
+            'X-SIGN-NONCE' => $py->getNonce(),
         ]);
 
         $res->assertStatus(400);
@@ -61,11 +60,11 @@ class DefaultSignatureTest extends SignatureTestCase
             ->build();
 
         $res = $this->get('/', [
-            'Accept'        => 'application/json',
+            'Accept' => 'application/json',
             'X-SIGN-APP-ID' => $py->getAppId(),
-            'X-SIGN'        => $py->getSign(),
-            'X-SIGN-TIME'   => $py->getTimestamp(),
-            'X-SIGN-NONCE'  => $py->getNonce(),
+            'X-SIGN' => $py->getSign(),
+            'X-SIGN-TIME' => $py->getTimestamp(),
+            'X-SIGN-NONCE' => $py->getNonce(),
         ]);
 
         $res->assertOk();
@@ -77,8 +76,8 @@ class DefaultSignatureTest extends SignatureTestCase
         $this->withoutExceptionHandling();
 
         $this->setUpCustomSignatureConfig([
-            'resolver'       => 'query',
-            'repository'     => 'array',
+            'resolver' => 'query',
+            'repository' => 'array',
             'default_app_id' => 'tFVzAUy07VIj2p8v',
         ]);
 
@@ -93,12 +92,12 @@ class DefaultSignatureTest extends SignatureTestCase
 
         $params = http_build_query([
             '_appid' => $ctx->getPayload()->getAppId(),
-            '_sign'  => $ctx->getPayload()->getSign(),
-            '_time'  => $ctx->getPayload()->getTimestamp(),
+            '_sign' => $ctx->getPayload()->getSign(),
+            '_time' => $ctx->getPayload()->getTimestamp(),
             '_nonce' => $ctx->getPayload()->getNonce(),
         ]);
 
-        $res = $this->post('/custom/foo?' . $params, ['a' => 1]);
+        $res = $this->post('/custom/foo?'.$params, ['a' => 1]);
 
         $res->assertOk();
         $res->assertSee('bar');

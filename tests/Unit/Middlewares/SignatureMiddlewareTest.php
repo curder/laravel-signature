@@ -1,21 +1,19 @@
 <?php
 
-
 namespace Hypocenter\LaravelSignature\Tests\Unit\Middlewares;
 
-
-use Hypocenter\LaravelSignature\Contracts\Factory;
-use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
-use Hypocenter\LaravelSignature\Exceptions\VerifyException;
-use Hypocenter\LaravelSignature\Middlewares\SignatureMiddleware;
+use Mockery as m;
+use Illuminate\Http\Request;
+use PHPUnit\Framework\TestCase;
 use Hypocenter\LaravelSignature\Payload\Payload;
+use Hypocenter\LaravelSignature\Contracts\Factory;
 use Hypocenter\LaravelSignature\Signature\Context;
 use Hypocenter\LaravelSignature\Signature\Signature;
-use Illuminate\Http\Request;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit\Framework\TestCase;
-use Mockery as m;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Hypocenter\LaravelSignature\Exceptions\VerifyException;
+use Hypocenter\LaravelSignature\Middlewares\SignatureMiddleware;
+use Hypocenter\LaravelSignature\Exceptions\InvalidArgumentException;
 
 class SignatureMiddlewareTest extends TestCase
 {
@@ -32,7 +30,7 @@ class SignatureMiddlewareTest extends TestCase
         $manager = m::mock(Factory::class);
         $manager->shouldReceive('get')->andReturn($signature);
 
-        $next = static function($request) {
+        $next = static function ($request) {
             return 'called';
         };
 
@@ -53,7 +51,7 @@ class SignatureMiddlewareTest extends TestCase
         $manager = m::mock(Factory::class);
         $manager->shouldReceive('get')->andReturn($signature);
 
-        $next = static function($request) {
+        $next = static function ($request) {
             return 'called';
         };
 
@@ -64,6 +62,7 @@ class SignatureMiddlewareTest extends TestCase
 
         $this->assertEquals('called', $res);
     }
+
     public function testVerifyExceptionHttpException(): void
     {
         $py = m::mock(Payload::class);
@@ -75,7 +74,7 @@ class SignatureMiddlewareTest extends TestCase
         $manager = m::mock(Factory::class);
         $manager->shouldReceive('get')->andReturn($signature);
 
-        $next = static function($request) {
+        $next = static function ($request) {
             return 'called';
         };
 
@@ -86,5 +85,4 @@ class SignatureMiddlewareTest extends TestCase
 
         $this->assertEquals('called', $res);
     }
-
 }
