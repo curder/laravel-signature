@@ -133,7 +133,7 @@ return [
           'X-SIGN-NONCE' => $payload->getNonce(),
       ])
       ->baseUrl('https://laravel11-demo.test')
-      ->send($payload->getMethod(), $payload->getPath().'?'.http_build_query($payload->getData()))
+      ->send($payload->getMethod(), $payload->getPath().'?'.http_build_query($payload->getData())API 接口参数签名)
       ->body();
   ```
 
@@ -190,3 +190,8 @@ return \Illuminate\Support\Facades\Http::withoutVerifying()
     Route::get('no-sign', 'SignController')->middleware('signature:custom'); // 使用其他驱动
     ```
 
+## 参考
+
+- [API 接口参数签名](https://sa-token.cc/doc.html#/plugin/api-sign)
+- [API接口参数签名 跨系统接口调用安全方案(sa-token) | Bilibili ](https://www.bilibili.com/video/BV17oeKeZEHo)
+- [larva/laravel-auth-signature-guard](https://github.com/larvatecn/laravel-auth-signature-guard)
