@@ -2,6 +2,8 @@
 
 Signature helper for Laravel
 
+<img width="1096" alt="image" src="https://github.com/user-attachments/assets/d5af990b-1068-47d3-a9eb-e27b5e606601">
+
 [三方接入文档](./INTERGRATION.md)
 
 ## 特性
