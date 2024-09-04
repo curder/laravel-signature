@@ -21,11 +21,10 @@ class SignatureMiddleware
 
     /**
      * @param  null  $signatureName
-     * @return mixed
      *
      * @throws Exception
      */
-    public function handle(Request $request, Closure $next, $signatureName = null)
+    public function handle(Request $request, Closure $next, $signatureName = null): mixed
     {
         try {
             $signature = $this->signatureManager->get($signatureName);

@@ -1,21 +1,22 @@
 # laravel-signature
+
 Signature helper for Laravel
 
 [三方接入文档](./INTERGRATION.md)
 
-#### 特性
+## 特性
 
 * 对请求参数进行签名验证, 以保证数据的完整性
 * 每次签名只能使用一次
 * 支持 Laravel 11.x
 
-#### 安装
+## 安装
 
 ```bash
 composer require hypocenter/laravel-signature
 ```
 
-#### 配置
+## 配置
 
 ```
 php artisan vendor:publish --provider="Hypocenter\LaravelSignature\SignatureServiceProvider"
@@ -38,7 +39,7 @@ return [
             'nonce_length'   => 16,
             'cache_driver'   => 'file',
             'cache_name'     => 'laravel-signature',
-            'time_tolerance' => 5* 60,
+            'time_tolerance' => 5 * 60,
             'default_app_id' => 'tFVzAUy07VIj2p8v',
         ]
     ],
@@ -85,27 +86,28 @@ return [
 ];
 ```
 
-#### 驱动
+## 驱动
 
 可以配置多个驱动以应对不同场景的应用配置
 
 驱动需要使用下面配置的`Repository`和`Resolver`
 
-#### Repository
+### Repository
 
-定义如何获取应用配置
+定义如何获取应用配置。
 
-* ArrayRepository: 应用AppID和Secret配置在PHP数组中, 适合简单固定的使用场景
-* ModelRepository: 应用AppID和Secret配置在数据库中,适合App较多的使用场景, 默认提供`Partner`模型来处理数据库操作. 可继承 Partner 类, 自定义模型
+* `ArrayRepository`: 应用 AppID 和 Secret 配置在 PHP 数组中, 适合简单固定的使用场景。
+* `ModelRepository`: 应用 AppID 和 Secret 配置在数据库中,适合 App 较多的使用场景, 默认提供 `AppDefine` 模型来处理数据库操作.
+  可继承 `AppDefine` 类, 自定义模型。
 
-#### Resolver
+### Resolver
 
-定义如何从请求中获取相关校验参数
+定义如何从请求中获取相关校验参数。
 
-* HeaderResolver: 从 HTTP Header 中获取
-* QueryResolver: 从 GET 参数中获取
+* `HeaderResolver`: 从 HTTP 请求头中获取
+* `QueryResolver`: 从 GET 参数中获取
 
-#### 签名
+## 签名
 
 如果作为客户端,单独使用签名可无需 `Resolver`, 但 `Repositroy` 必须配置
 
@@ -133,23 +135,27 @@ $res = $client->request($payload->getMethod(), $payload->getPath() . '?'. http_b
 ]);
 ```
 
-#### 中间件
+## 中间件
 
-配置
+- 配置
 
-```php
-class Kernel extends HttpKernel {
-  protected $routeMiddleware = [
+    ```diff
+    // bootstrap/app.php
+    + use Hypocenter\LaravelSignature\Middlewares\SignatureMiddleware;
+  
+    return Application::configure(basePath: dirname(__DIR__))
         // ...
-        'signature' => \Hypocenter\LaravelSignature\Middleware\SignatureMiddleware::class
-    ];
-}
-```
+        ->withMiddleware(function (Middleware $middleware) {
+    +       $middleware->alias(['signature' => SignatureMiddleware::class]);
+        })
+        // ...
+    ;
+    ```
 
-使用
+- 使用
 
-```php
-Route::get('test-sign', 'SignController')->middleware('signature'); // 使用默认渠道
-Route::get('test-sign', 'SignController')->middleware('signature:custom'); // 使用其他驱动
-```
+    ```php
+    Route::get('sign', 'SignController')->middleware('signature'); // 使用默认驱动
+    Route::get('no-sign', 'SignController')->middleware('signature:custom'); // 使用其他驱动
+    ```
 
