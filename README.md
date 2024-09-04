@@ -139,32 +139,32 @@ return [
 
 - **POST 请求**
 
-```php
-$payload = Payload::forSign()
-    ->setAppId(config('signature.signatures.default.default_app_id')) // 如果设置了 default_app_id 可省略
--    ->setMethod('GET')
-+    ->setMethod('POST')
-    ->setPath('test')
-    ->setData(['foo' => 'bar'])
-    ->build();
+  ```diff
+  $payload = Payload::forSign()
+      ->setAppId(config('signature.signatures.default.default_app_id')) // 如果设置了 default_app_id 可省略
+  -    ->setMethod('GET')
+  +    ->setMethod('POST')
+      ->setPath('test')
+      ->setData(['foo' => 'bar'])
+      ->build();
 
-$driver = app('signature')->get();
-$driver->sign($payload);
-//    dd($payload->getAppId(), $payload->getSign(), $payload->getTimestamp(), $payload->getNonce(), $payload->getMethod(), $payload->getPath());
+  $driver = app('signature')->get();
+  $driver->sign($payload);
+  //    dd($payload->getAppId(), $payload->getSign(), $payload->getTimestamp(), $payload->getNonce(), $payload->getMethod(), $payload->getPath());
 
-return \Illuminate\Support\Facades\Http::withoutVerifying()
-    ->withHeaders([
-        'Accept' => 'application/json',
-        'X-SIGN-APP-ID' => $payload->getAppId(),
-        'X-SIGN' => $payload->getSign(),
-        'X-SIGN-TIMESTAMP' => $payload->getTimestamp(),
-        'X-SIGN-NONCE' => $payload->getNonce(),
-    ])
-    ->baseUrl('https://laravel11-demo.test')
--    ->send($payload->getMethod(), $payload->getPath().'?'.http_build_query($payload->getData()))
-+    ->send($payload->getMethod(), $payload->getPath(), ['form_params' => $payload->getData()])
-    ->body();
-```
+  return \Illuminate\Support\Facades\Http::withoutVerifying()
+      ->withHeaders([
+          'Accept' => 'application/json',
+          'X-SIGN-APP-ID' => $payload->getAppId(),
+          'X-SIGN' => $payload->getSign(),
+          'X-SIGN-TIMESTAMP' => $payload->getTimestamp(),
+          'X-SIGN-NONCE' => $payload->getNonce(),
+      ])
+      ->baseUrl('https://laravel11-demo.test')
+  -    ->send($payload->getMethod(), $payload->getPath().'?'.http_build_query($payload->getData()))
+  +    ->send($payload->getMethod(), $payload->getPath(), ['form_params' => $payload->getData()])
+      ->body();
+  ```
 
 ## 中间件
 
