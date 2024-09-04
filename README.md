@@ -111,28 +111,59 @@ return [
 
 如果作为客户端,单独使用签名可无需 `Resolver`, 但 `Repositroy` 必须配置
 
-```php
-$client = new \GuzzleHttp\Client(['base_uri' => env('RPC_SERVER')]);
+- **GET 请求**
+  ```php
+  $payload = Payload::forSign()
+      ->setAppId(config('signature.signatures.default.default_app_id')) // 如果设置了 default_app_id 可省略
+      ->setMethod('GET')
+      ->setPath('test')
+      ->setData(['foo' => 'bar'])
+      ->build();
 
-$payload = new Payload::forSign()
-  ->setAppId('your app ID') // 如果设置了 default_app_id 可省略
-  ->setMethod('GET')
-  ->setPath('api/users')
-  ->setData(['page' => 1, 'page_size' => 20])
-  ->build();
+  $driver = app('signature')->get();
+  $driver->sign($payload);
+  //    dd($payload->getAppId(), $payload->getSign(), $payload->getTimestamp(), $payload->getNonce(), $payload->getMethod(), $payload->getPath());
+
+  return \Illuminate\Support\Facades\Http::withoutVerifying()
+      ->withHeaders([
+          'Accept' => 'application/json',
+          'X-SIGN-APP-ID' => $payload->getAppId(),
+          'X-SIGN' => $payload->getSign(),
+          'X-SIGN-TIMESTAMP' => $payload->getTimestamp(),
+          'X-SIGN-NONCE' => $payload->getNonce(),
+      ])
+      ->baseUrl('https://laravel11-demo.test')
+      ->send($payload->getMethod(), $payload->getPath().'?'.http_build_query($payload->getData()))
+      ->body();
+  ```
+
+- **POST 请求**
+
+```php
+$payload = Payload::forSign()
+    ->setAppId(config('signature.signatures.default.default_app_id')) // 如果设置了 default_app_id 可省略
+-    ->setMethod('GET')
++    ->setMethod('POST')
+    ->setPath('test')
+    ->setData(['foo' => 'bar'])
+    ->build();
 
 $driver = app('signature')->get();
 $driver->sign($payload);
+//    dd($payload->getAppId(), $payload->getSign(), $payload->getTimestamp(), $payload->getNonce(), $payload->getMethod(), $payload->getPath());
 
-$res = $client->request($payload->getMethod(), $payload->getPath() . '?'. http_build_query($payload->getData()), [
-    'headers' => [
-        'Accept'        => "application/json",
+return \Illuminate\Support\Facades\Http::withoutVerifying()
+    ->withHeaders([
+        'Accept' => 'application/json',
         'X-SIGN-APP-ID' => $payload->getAppId(),
-        'X-SIGN'        => $payload->getSign(),
-        'X-SIGN-TIME'   => $payload->getTimestamp(),
-        'X-SIGN-NONCE'  => $payload->getNonce()
-    ]
-]);
+        'X-SIGN' => $payload->getSign(),
+        'X-SIGN-TIMESTAMP' => $payload->getTimestamp(),
+        'X-SIGN-NONCE' => $payload->getNonce(),
+    ])
+    ->baseUrl('https://laravel11-demo.test')
+-    ->send($payload->getMethod(), $payload->getPath().'?'.http_build_query($payload->getData()))
++    ->send($payload->getMethod(), $payload->getPath(), ['form_params' => $payload->getData()])
+    ->body();
 ```
 
 ## 中间件

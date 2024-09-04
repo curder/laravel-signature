@@ -11,11 +11,7 @@ class Context
 
     private ?string $raw;
 
-    public function __construct(private Payload $payload, private ?Define $define = null)
-    {
-        $this->payload = $payload;
-        $this->define = $define;
-    }
+    public function __construct(private Payload $payload, private ?Define $define = null) {}
 
     public function getPayload(): Payload
     {
