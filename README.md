@@ -25,7 +25,7 @@ composer require hypocenter/laravel-signature:dev-master
 php artisan vendor:publish --provider="Hypocenter\LaravelSignature\SignatureServiceProvider"
 ```
 
-执行命令后会生成配置文件 app/config/signature.php
+执行命令后会生成配置文件 `config/signature.php`，内容如下：
 
 ```php
 <?php
@@ -94,24 +94,22 @@ return [
 
 ## 驱动
 
-可以配置多个驱动以应对不同场景的应用配置
-
-驱动需要使用下面配置的`Repository`和`Resolver`
+可以配置多个驱动以应对不同场景的应用配置，驱动需要使用下面配置的`Repository`和`Resolver`。
 
 ### Repository
 
 定义如何获取应用配置。
 
-* `ArrayRepository`: 应用 AppID 和 Secret 配置在 PHP 数组中, 适合简单固定的使用场景。
-* `ModelRepository`: 应用 AppID 和 Secret 配置在数据库中,适合 App 较多的使用场景, 默认提供 `AppDefine` 模型来处理数据库操作.
+* `ArrayRepository`: 应用 `AppID` 和 `Secret` 配置在 PHP 数组中, 适合简单固定的使用场景。
+* `ModelRepository`: 应用 `AppID` 和 `Secret` 配置在数据库中,适合 App 较多的使用场景, 默认提供 `AppDefine` 模型来处理数据库操作.
   可继承 `AppDefine` 类, 自定义模型。
 
 ### Resolver
 
 定义如何从请求中获取相关校验参数。
 
-* `HeaderResolver`: 从 HTTP 请求头中获取
-* `QueryResolver`: 从 GET 参数中获取
+* `HeaderResolver`: 从 `HTTP` 请求头中获取
+* `QueryResolver`: 从 `GET` 参数中获取
 
 ## 签名
 
