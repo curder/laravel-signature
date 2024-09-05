@@ -135,7 +135,7 @@ import requests
 import time
 import random
 import string
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlencode
 
 
 # 工具函数：生成当前秒级时间戳
@@ -149,117 +149,69 @@ def random_string(length=24):
 
 
 # 工具函数：生成签名
-def arr2str(params):
-    if not params:
+def arr2str(data):
+    if not data:
         return ''
-    # 对参数按 key 排序，并生成 "key:value" 的字符串
-    sorted_params = sorted(params.items())
+
     result = []
-    for key, values in sorted_params:
-        if isinstance(values, dict):
-            # 递归处理嵌套字典
-            param_value = f'[{arr2str(values)}]'
-        elif isinstance(values, list):
-            # 处理列表
-            param_value = '[' + ';'.join(
-                f'{str(index)}:{str(values[index])}' for index in range(len(values))) + ']'
-        else:
-            # 处理单个值
-            param_value = str(values)
-        result.append(f'{key}:{param_value}')
-    return ';'.join(result)
-
-
-# 工具函数：生成参数 map，递归处理嵌套字典和列表，并按 key 排序
-def get_map(parameters):
-    p_map = {}
 
     def process_value(value):
         if isinstance(value, dict):
-            # 递归处理字典，并对键排序
-            return {k: process_value(v) for k, v in sorted(value.items())}
+            return '[' + arr2str(value) + ']'
         elif isinstance(value, list):
-            # 处理列表，将列表中的元素转为字符串并连接
-            return '[' + ';'.join(f'{str(index)}:{str(value[index])}' for index in range(len(value))) + ']'
+            return '[' + ';'.join(f'{i}:{v}' for i, v in enumerate(value)) + ']'
         else:
-            # 其他类型直接转为字符串
             return str(value)
 
-    # 对顶级键进行排序
-    for key, value in sorted(parameters.items()):
-        p_map[key] = process_value(value)
+    for key in sorted(data):
+        result.append(f'{key}:{process_value(data[key])}')
 
-    return p_map
-
-
-# 工具函数：生成 HMAC 签名
-def generate_hmac(secret, message):
-    return hmac.new(secret.encode(), message.encode(), hashlib.sha1).hexdigest()
+    return ';'.join(result)
 
 
-def generate_sign(app_id, secret, timestamp, method, uri, parameters, nonce):
-    # 签名参数组装
+def generate_sign(app_id, secret, timestamp, method, path, nonce, data):
     sign_arr = [
         app_id,
         secret,
         timestamp,
-        method,
-        uri.lstrip('/').lower(),
-        arr2str(parameters),
+        method.lower(),
+        path.lower(),
+        arr2str(data),
         nonce
     ]
-
-    # 使用 "|" 连接签名参数
     raw_string = '|'.join(sign_arr)
-
-    print(f"Signature String: {raw_string}")
-
-    # 生成 HMAC-SHA1 签名
-    return generate_hmac(secret, raw_string)
+    return hmac.new(secret.encode(), raw_string.encode(), hashlib.sha1).hexdigest()
 
 
 # 请求函数
 def request(method, uri, parameters, app_id, secret, base_url):
-    # 请求方法
-    method = method.lower()
-    # 时间戳
+    method = method.upper()
     timestamp = current_seconds()
-    # 随机字符串
     nonce = random_string()
-    # 请求路径
     path = urljoin(base_url, uri)
-    # 获取请求参数
-    p_map = get_map(parameters)
-    # 获取签名
-    sign = generate_sign(app_id=app_id, secret=secret, timestamp=timestamp, method=method, uri=uri,
-                         parameters=p_map, nonce=nonce)
 
-    # 发起 HTTP 请求
+    sign = generate_sign(app_id, secret, timestamp, method, uri.lstrip('/'), nonce, parameters)
+
     headers = {
-        'Content-Type': 'application/json',
-        "X-SIGN-APP-ID": app_id,
-        "X-SIGN": sign,
-        "X-SIGN-TIMESTAMP": timestamp,
-        "X-SIGN-NONCE": nonce
+        'Accept': 'application/json',
+        'X-SIGN-APP-ID': app_id,
+        'X-SIGN': sign,
+        'X-SIGN-TIMESTAMP': timestamp,
+        'X-SIGN-NONCE': nonce
     }
 
-    # 打印调试信息（在生产环境中可以通过日志记录）
-    print(f"Headers: {headers}")
-    print(f"Request Parameters: {p_map}")
-
-    # 根据方法发起不同的请求
-    if method == 'get':
-        response = requests.get(path, params=p_map, headers=headers, verify=False)
-    elif method == 'post':
-        response = requests.post(path, json=p_map, headers=headers, verify=False)
+    if method == 'GET':
+        response = requests.get(path, params=parameters, headers=headers, verify=False)
+    elif method == 'POST':
+        response = requests.post(path, json=parameters, headers=headers, verify=False)
     else:
         raise ValueError("Unsupported HTTP method")
 
     return response
 
 
+# Example Usage
 if __name__ == '__main__':
-    # Example Usage:
     http_method = 'POST'
     request_uri = '/test'
     parameter_map = {'b': 1, 'c': 2, 'a': [6, 3, 4], 'd': {'a': 5, 'b': 6}}
@@ -271,4 +223,3 @@ if __name__ == '__main__':
     print(f"Response: {response.status_code}")
     print(f"Response Content: {response.content.decode()}")
 ```
-
