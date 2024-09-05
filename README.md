@@ -15,7 +15,8 @@ Signature helper for Laravel
 ## 安装
 
 ```bash
-composer require hypocenter/laravel-signature
+composer config repositories vcs https://github.com/curder/laravel-signature.git
+composer require hypocenter/laravel-signature:dev-master
 ```
 
 ## 配置
