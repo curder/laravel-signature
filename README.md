@@ -92,6 +92,38 @@ return [
 ];
 ```
 
+### 配置其他驱动
+
+```diff
+return [
+    // 默认的驱动
+    'default' => 'custom',                                 # 修改默认驱动为 `custom`
+
+    // 支持多个签名器配置
+    'signatures' => [
+        'default' => [
+            'resolver' => 'header',
+            'repository' => 'array',
+            'nonce_length' => 16,
+            'cache_driver' => 'file',
+            'cache_name' => 'laravel-signature',
+            'time_tolerance' => 5 * 60,
+            'default_app_id' => 'tFVzAUy07VIj2p8v2',
+        ],
++        'custom' => [
++            'resolver' => 'header',                         # 使用 header 传递参数 
++            'repository' => 'model',                        # 使用数据库驱动
++            'nonce_length' => 24,                           # 修改随机数的长度
++            'cache_driver' => 'redis',                      # 使用 Redis 做缓存，防止请求重放
++            'cache_name' => 'laravel-custom-signature',     # 缓存名称
++            'time_tolerance' => 5 * 60,                     # 时间容忍度，单位秒
++            'default_app_id' => 'Zv3DCb1TGJt3ASYte78Pxl7g', # 数据库存在且默认
++        ],
+    ],
+    // ...
+];
+```
+
 ## 驱动
 
 可以配置多个驱动以应对不同场景的应用配置，驱动需要使用下面配置的`Repository`和`Resolver`。
