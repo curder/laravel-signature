@@ -25,12 +25,14 @@
 * 如果 VALUE 是 Array, 视为 KEY 是整数的 Map, 执行 Map 的逻辑
 * KEY:VALUE 组之间用分号“;”分割
 * 例如
-  * 输入: `b=1&c=2&a[]=3&a[]=4&d[a]=5&d[b]=6` 或 `{"b": 1, "c": 2, "a": [3,4], "d": {"a":4, "b":5 }}`
-  * 输出: `a:[0:3;1:4];b:1;c:2;d:[a:5;d:6]`
+    * 输入: `b=1&c=2&a[]=3&a[]=4&d[a]=5&d[b]=6` 或 `{"b": 1, "c": 2, "a": [3,4], "d": {"a":4, "b":5 }}`
+    * 输出: `a:[0:3;1:4];b:1;c:2;d:[a:5;d:6]`
 
 PHP 示例代码:
 
 ```php
+<?php
+
 function sign($appId, $secret, $timestamp, $method, $path, $nonce, $data): string
 {
     $signArr = [
@@ -43,35 +45,48 @@ function sign($appId, $secret, $timestamp, $method, $path, $nonce, $data): strin
         $nonce,
     ];
 
-    $raw = join('|', $signArr);
-    $sign = hash_hmac('sha1', $raw, $secret);
+    $raw = implode('|', $signArr);
 
-    return $sign;
+    return hash_hmac('sha1', $raw, $secret);
 }
 
-function arr2str(?array &$data)
+function arr2str(?array $data): string
 {
-    if (!$data) {
+    if (empty($data)) {
         return '';
     }
 
-    $str = [];
-
     ksort($data);
 
-    foreach ($data as $i => &$v) {
-        $str[] = "{$i}:" . (is_array($v) ? '[' . arr2str($v) . ']' : $v);
+    $result = [];
+
+    foreach ($data as $key => $value) {
+        if (is_array($value)) {
+            // 递归处理嵌套数组
+            $result[] = "{$key}:[" . arr2str($value) . "]";
+        } else {
+            // 直接附加非数组值
+            $result[] = "{$key}:{$value}";
+        }
     }
 
-    return join(';', $str);
+
+    return implode(';', $result);
 }
 
-$s = sign('tFVzAUy07VIj2p8v', 'u4JsCDCwCUakBCVn', '1574661278', 'GET', 'api/users', '7o2jpms6l8ep', [
-    "b" => 1,
-    "c" => 2,
-    "a" => [3,4],
-    "d" => ["a" => 5, "b" => 6]
-]);
+$s = sign(
+    appId: 'tFVzAUy07VIj2p8v',
+    secret: 'u4JsCDCwCUakBCVn',
+    timestamp: '1574661278',
+    method: 'GET',
+    path: 'api/users',
+    nonce: '7o2jpms6l8ep',
+    data: [
+        'b' => 1,
+        'c' => 2,
+        'a' => [3, 4],
+        'd' => ['a' => 5, 'b' => 6],
+    ]);
 
 assert("ddf8d0d008a12fc20a7c8713707886c2d814a7f7" === $s);
 ```
@@ -81,11 +96,12 @@ assert("ddf8d0d008a12fc20a7c8713707886c2d814a7f7" === $s);
 请求参数 (Header):
 
 * X-SIGN-APP-ID: APP ID
-* X-SIGN-TIME: 签名UNIX时间戳(秒)
+* X-SIGN-TIMESTAMP: 签名UNIX时间戳(秒)
 * X-SIGN-NONCE: 签名随机数
 * X-SIGN: 签名
 
 PHP 示例代码
+
 ```php
 $client = new \GuzzleHttp\Client(['base_uri' => env('RPC_SERVER')]);
 
@@ -104,98 +120,155 @@ $res = $client->request($method, $path . '?' . http_build_query($query), [
         'Accept'        => "application/json",
         'X-SIGN-APP-ID' => $appId,
         'X-SIGN'        => $sign,
-        'X-SIGN-TIME'   => $timestamp,
+        'X-SIGN-TIMESTAMP'   => $timestamp,
         'X-SIGN-NONCE'  => $nonce,
     ]
 ]);
 ```
-### Java 示例代码
-其他工具类涉及到 hutool工具类，详情 https://hutool.cn/docs/
-```java
-public JSONObject request(HttpServletRequest httpServletRequest) throws UNIException {
-  String method = httpServletRequest.getMethod().toLowerCase();
-  String requestURI = httpServletRequest.getRequestURI();
-  Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
-  //时间戳
-  String timeStamp = DateUtil.currentSeconds() + "";
-  //随机字符串
-  String nonce = RandomUtil.randomString(10);
-  //请求路径
-  String path = uni + requestURI;
-  ArrayList signArr = new ArrayList();
-  signArr.add(appId);
-  signArr.add(secret);
-  signArr.add(timeStamp);
-  signArr.add(method.toLowerCase());
-  signArr.add(requestURI.toLowerCase());
-  signArr.add(SignatureUtil.arr2str(parameterMap));
-  signArr.add(nonce);
-  String join = CollUtil.join(signArr, "|");
-  HMac hmac = SecureUtil.hmac(HmacAlgorithm.HmacSHA1, secret);
-  String digestHex = hmac.digestHex(join);
-  Map pMap = SignatureUtil.getMap(parameterMap);
-  HttpResponse execute = SignatureUtil.getMethod(path, method, pMap)
-    .header("X-SIGN-APP-ID", appId)
-    .header("X-SIGN", digestHex)
-    .header("X-SIGN-TIME", timeStamp)
-    .header("X-SIGN-NONCE", nonce)
-    .execute();
-  return getJSONObject(execute);
-}
 
-/**
- * 遍历参数，组装成字符串
- *
- * @param params
- * @return
- */
-public static String arr2str(Map<String, String[]> params) {
-  StringBuilder sb = new StringBuilder();
-  if (!CollectionUtils.isEmpty(params)) {
-    params.entrySet()
-      .stream()
-      .sorted(Map.Entry.comparingByKey())
-      .forEach(paramEntry -> {
-        String paramValue = String.join(";", Arrays.stream(paramEntry.getValue()).sorted().toArray(String[]::new));
-        sb.append(paramEntry.getKey()).append(":").append(paramValue).append(';');
-      });
-  } else {
-    return "";
-  }
-  String string = sb.toString();
-  String trimEnd = StrUtil.removeSuffix(string, ";");
-  return trimEnd;
-}
+### Python 示例代码
 
-/**
- * 组装参数成map
- *
- * @param parameterMap
- * @return
- */
-public static Map getMap(Map<String, String[]> parameterMap) {
-  Map pMap = new HashMap();
-  Iterator entries = parameterMap.entrySet().iterator();
-  Map.Entry entry;
-  String name = "";
-  String value = "";
-  while (entries.hasNext()) {
-    entry = (Map.Entry) entries.next();
-    name = (String) entry.getKey();
-    Object valueObj = entry.getValue();
-    if (null == valueObj) {
-      value = "";
-    } else if (valueObj instanceof String[]) {
-      String[] values = (String[]) valueObj;
-      for (int i = 0; i < values.length; i++) {
-        value = values[i] + ",";
-      }
-      value = value.substring(0, value.length() - 1);
-    } else {
-      value = valueObj.toString();
+```python
+import hashlib
+import hmac
+import requests
+import time
+import random
+import string
+from urllib.parse import urljoin
+
+
+# 工具函数：生成当前秒级时间戳
+def current_seconds():
+    return str(int(time.time()))
+
+
+# 工具函数：生成随机字符串
+def random_string(length=24):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+
+# 工具函数：生成签名
+def arr2str(params):
+    if not params:
+        return ''
+    # 对参数按 key 排序，并生成 "key:value" 的字符串
+    sorted_params = sorted(params.items())
+    result = []
+    for key, values in sorted_params:
+        if isinstance(values, dict):
+            # 递归处理嵌套字典
+            param_value = f'[{arr2str(values)}]'
+        elif isinstance(values, list):
+            # 处理列表
+            param_value = '[' + ';'.join(
+                f'{str(index)}:{str(values[index])}' for index in range(len(values))) + ']'
+        else:
+            # 处理单个值
+            param_value = str(values)
+        result.append(f'{key}:{param_value}')
+    return ';'.join(result)
+
+
+# 工具函数：生成参数 map，递归处理嵌套字典和列表，并按 key 排序
+def get_map(parameters):
+    p_map = {}
+
+    def process_value(value):
+        if isinstance(value, dict):
+            # 递归处理字典，并对键排序
+            return {k: process_value(v) for k, v in sorted(value.items())}
+        elif isinstance(value, list):
+            # 处理列表，将列表中的元素转为字符串并连接
+            return '[' + ';'.join(f'{str(index)}:{str(value[index])}' for index in range(len(value))) + ']'
+        else:
+            # 其他类型直接转为字符串
+            return str(value)
+
+    # 对顶级键进行排序
+    for key, value in sorted(parameters.items()):
+        p_map[key] = process_value(value)
+
+    return p_map
+
+
+# 工具函数：生成 HMAC 签名
+def generate_hmac(secret, message):
+    return hmac.new(secret.encode(), message.encode(), hashlib.sha1).hexdigest()
+
+
+def generate_sign(app_id, secret, timestamp, method, uri, parameters, nonce):
+    # 签名参数组装
+    sign_arr = [
+        app_id,
+        secret,
+        timestamp,
+        method,
+        uri.lstrip('/').lower(),
+        arr2str(parameters),
+        nonce
+    ]
+
+    # 使用 "|" 连接签名参数
+    raw_string = '|'.join(sign_arr)
+
+    print(f"Signature String: {raw_string}")
+
+    # 生成 HMAC-SHA1 签名
+    return generate_hmac(secret, raw_string)
+
+
+# 请求函数
+def request(method, uri, parameters, app_id, secret, base_url):
+    # 请求方法
+    method = method.lower()
+    # 时间戳
+    timestamp = current_seconds()
+    # 随机字符串
+    nonce = random_string()
+    # 请求路径
+    path = urljoin(base_url, uri)
+    # 获取请求参数
+    p_map = get_map(parameters)
+    # 获取签名
+    sign = generate_sign(app_id=app_id, secret=secret, timestamp=timestamp, method=method, uri=uri,
+                         parameters=p_map, nonce=nonce)
+
+    # 发起 HTTP 请求
+    headers = {
+        'Content-Type': 'application/json',
+        "X-SIGN-APP-ID": app_id,
+        "X-SIGN": sign,
+        "X-SIGN-TIMESTAMP": timestamp,
+        "X-SIGN-NONCE": nonce
     }
-    pMap.put(name, value.trim());
-  }
-  return pMap;
-}
+
+    # 打印调试信息（在生产环境中可以通过日志记录）
+    print(f"Headers: {headers}")
+    print(f"Request Parameters: {p_map}")
+
+    # 根据方法发起不同的请求
+    if method == 'get':
+        response = requests.get(path, params=p_map, headers=headers, verify=False)
+    elif method == 'post':
+        response = requests.post(path, json=p_map, headers=headers, verify=False)
+    else:
+        raise ValueError("Unsupported HTTP method")
+
+    return response
+
+
+if __name__ == '__main__':
+    # Example Usage:
+    http_method = 'POST'
+    request_uri = '/test'
+    parameter_map = {'b': 1, 'c': 2, 'a': [6, 3, 4], 'd': {'a': 5, 'b': 6}}
+    app_id = 'Zv3DCb1TGJt3ASYte78Pxl7g'
+    secret = 'pcRBsBBC9ErduMGw5wUWMtKY'
+    base_url = 'https://laravel11-demo.test'
+
+    response = request(http_method, request_uri, parameter_map, app_id, secret, base_url)
+    print(f"Response: {response.status_code}")
+    print(f"Response Content: {response.content.decode()}")
 ```
+
