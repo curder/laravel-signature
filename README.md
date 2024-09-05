@@ -29,6 +29,9 @@ php artisan vendor:publish --provider="Hypocenter\LaravelSignature\SignatureServ
 ```php
 <?php
 
+use Hypocenter\LaravelSignature\Define;
+use Hypocenter\LaravelSignature\Payload\Resolvers;
+
 return [
     // 默认的驱动
     'default'      => 'default',
@@ -49,17 +52,17 @@ return [
     // 数据获取器定义，支持从不同来源获取
     'resolvers'    => [
         'header' => [
-            'class'         => Hypocenter\LaravelSignature\Payload\Resolvers\HeaderResolver::class,
+            'class'         => Resolvers\HeaderResolver::class,
             'key_app_id'    => 'X-SIGN-APP-ID',
             'key_sign'      => 'X-SIGN',
-            'key_timestamp' => 'X-SIGN-TIME',
+            'key_timestamp' => 'X-SIGN-TIMESTAMP',
             'key_nonce'     => 'X-SIGN-NONCE',
         ],
         'query'  => [
-            'class'         => Hypocenter\LaravelSignature\Payload\Resolvers\QueryResolver::class,
+            'class'         => Resolvers\QueryResolver::class,
             'key_app_id'    => '_appid',
             'key_sign'      => '_sign',
-            'key_timestamp' => '_time',
+            'key_timestamp' => '_timestamp',
             'key_nonce'     => '_nonce',
         ]
     ],
@@ -68,12 +71,12 @@ return [
     'repositories' => [
         // 从数据库中读取
         'model' => [
-            'class' => Hypocenter\LaravelSignature\Define\Repositories\ModelRepository::class,
-            'model' => Hypocenter\LaravelSignature\Define\Models\AppDefine::class,
+            'class' => Define\Repositories\ModelRepository::class,
+            'model' => Define\Models\AppDefine::class,
         ],
         // 从配置文件中读取
         'array' => [
-            'class'   => Hypocenter\LaravelSignature\Define\Repositories\ArrayRepository::class,
+            'class'   => Define\Repositories\ArrayRepository::class,
             'defines' => [
                 // Add more defines here.
                 [
@@ -170,10 +173,9 @@ return [
 
 ## 中间件
 
-- 配置
+- `bootstrap/app.php` 配置
 
     ```diff
-    // bootstrap/app.php
     + use Hypocenter\LaravelSignature\Middlewares\SignatureMiddleware;
   
     return Application::configure(basePath: dirname(__DIR__))
@@ -185,7 +187,7 @@ return [
     ;
     ```
 
-- 使用
+- 路由中使用
 
     ```php
     Route::get('sign', 'SignController')->middleware('signature'); // 使用默认驱动
